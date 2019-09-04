@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<title>sode2html</title>
+<meta charset="UTF-8">
+</head>
+<body style="background-color:lightgrey;">
+<pre>
+<span style='color: purple'>#include <stdio.h></span><span style='color: red'><</span><span style='color: red'>s</span><span style='color: red'>t</span><span style='color: red'>d</span><span style='color: red'>i</span><span style='color: red'>o</span><span style='color: red'>.</span><span style='color: red'>h</span><span style='color: red'>></span>
+<span style='color: purple'>#include <stdlib.h></span><span style='color: red'><</span><span style='color: red'>s</span><span style='color: red'>t</span><span style='color: red'>d</span><span style='color: red'>l</span><span style='color: red'>i</span><span style='color: red'>b</span><span style='color: red'>.</span><span style='color: red'>h</span><span style='color: red'>></span>
+<span style='color: purple'>#include <ctype.h></span><span style='color: red'><</span><span style='color: red'>c</span><span style='color: red'>t</span><span style='color: red'>y</span><span style='color: red'>p</span><span style='color: red'>e</span><span style='color: red'>.</span><span style='color: red'>h</span><span style='color: red'>></span>
+<span style='color: purple'>#include <string.h></span><span style='color: red'><</span><span style='color: red'>s</span><span style='color: red'>t</span><span style='color: red'>r</span><span style='color: red'>i</span><span style='color: red'>n</span><span style='color: red'>g</span><span style='color: red'>.</span><span style='color: red'>h</span><span style='color: red'>></span>
+<span style='color: blue'>char operator[16] = "+-*/(){}<>&=[],;";</span>
+<span style='color: blue'>char keyword[32][12] = {"auto", "break", "case", "char", "const", "continue", "default", "do", </span>
+<span style='color: blue'>	"double", "else", "enum", "extern", "float", "for", " goto", "if",</span>
+<span style='color: blue'>	"int", "long","register", "return", "short", "signed", "sizeof", "static", </span>
+<span style='color: blue'>	"struct", "switch", "typedef", "union", "unsigned", "void", "volatile", "while"};</span>
+<span style='color: blue'>char format_specifier[8][3] = {"%d", "%f", "%s", "%c", "%ld", "%x", "%o", "%i"};</span>
+<span style='color: blue'></span>
+<span style='color: blue'>void preprocessor(char *buffer, int size, FILE *fd);</span>
+<span style='color: blue'>int keyword_checking(char*buffer);</span>
+<span style='color: blue'>char operator_checking(char*buffer);</span>
+<span style='color: blue'></span>
+<span style='color: blue'>int main(int argc, char *argv[])</span>
+<span style='color: blue'>{</span>
+<span style='color: blue'>	int i = 0, ch, dist, dist1;</span>
+<span style='color: blue'>	FILE *fp1, *fp, *fd, *fd1;</span>
+<span style='color: blue'></span>
+<span style='color: blue'>	char *buffer;</span>
+<span style='color: blue'>	char word[25];</span>
+<span style='color: blue'></span>
+<span style='color: blue'>	if (argc == 1)</span>
+<span style='color: blue'>	{</span>
+<span style='color: blue'>		printf("Insufficient Arguments..Provide a .c file\n");1J</span>
+<span style='color: blue'>		return -1;</span>
+<span style='color: blue'>	}</span>
+<span style='color: blue'></span>
+<span style='color: blue'>	fp = fopen(argv[1], "r");</span>
+<span style='color: blue'>	fp1 = fopen(argv[1], "r");</span>
+<span style='color: blue'>	fd = fopen("de.html", "w");</span>
+<span style='color: blue'>	fd1 = fopen("de.html", "w"); </span>
+<span style='color: blue'>	</span>
+<span style='color: blue'>	fprintf(fd, "<!DOCTYPE html>\n");</span>
+<span style='color: blue'>	fprintf(fd, "<html lang=\"en-US\">\n");</span>
+<span style='color: blue'>	fprintf(fd, "<head>\n");</span>
+<span style='color: blue'>	fprintf(fd, "<title>%s</title>\n", "sode2html");</span>
+<span style='color: blue'>	fprintf(fd, "<meta charset=\"UTF-8\">\n");</span>
+<span style='color: blue'>	//fprintf(fd, "<link rel=\"stylesheet\" href=\"styles.css\">\n");</span>
+<span style='color: blue'>	fprintf(fd, "</head>\n");</span>
+<span style='color: blue'>	fprintf(fd, "<body style=\"background-color:lightgrey;\">\n");</span>
+<span style='color: blue'>	fprintf(fd, "<pre>\n");qÌ</span>
+<span style='color: blue'>	</span>
+<span style='color: blue'>	//fseek(fd1,ftell(fd),SEEK_SET);</span>
+<span style='color: blue'>	//printf("%ld\n",ftell(fd));</span>
+<span style='color: blue'>	//printf("%ld\n",ftell(fd1));</span>
+<span style='color: blue'>	//fclose(fd);</span>
+<span style='color: blue'>	//use span and not the css formatting for changing color.</span>
+<span style='color: blue'>	printf("%ld\n",ftell(fd));</span>
+<span style='color: blue'>	printf("%ld\n",ftell(fd1));</span>
+<span style='color: blue'>	//fprintf(fd, "         sexy\n");</span>
+<span style='color: blue'>	printf("%ld\n",ftell(fd));</span>
+<span style='color: blue'>	printf("%ld\n",ftell(fd1));</span>
+<span style='color: blue'>	//itirate thru and take buffer while writing it in file using fprintf and changing color</span>
+<span style='color: blue'>	while((ch = fgetc(fp1)) != EOF)</span>
+<span style='color: blue'>	{</span>
+<span style='color: blue'>		if (ch == '\n')</span>
+<span style='color: blue'>		{</span>
+<span style='color: blue'>			dist = ftell(fp1) - ftell(fp) - 1;</span>
+<span style='color: blue'></span>
+<span style='color: blue'>			buffer = malloc((dist) * sizeof(char));</span>
+<span style='color: blue'>			fseek(fp1, -(dist + 1), SEEK_CUR);</span>
+<span style='color: blue'>			fread(buffer, dist, 1, fp1);</span>
+<span style='color: blue'>			//Compare for preprocessor directives!¥</span>
+<span style='color: blue'>			if(buffer[0] == '#')</span>
+<span style='color: blue'>			{</span>
+<span style='color: blue'>				fprintf(fd,"<span style='color: purple'>%s</span>",buffer);</span>
+<span style='color: blue'>				printf("xyzzzzzzzzzzzz:%s\n",buffer );</span>
+<span style='color: blue'>				preprocessor(buffer, dist, fd);</span>
+<span style='color: blue'>				fprintf(fd, "\n");</span>
+<span style='color: blue'>			}</span>
+<span style='color: blue'>			else</span>
+<span style='color: blue'>			{</span>
+<span style='color: blue'>				fprintf(fd,"<span style='color: blue'>%s</span>", buffer);</span>
+<span style='color: blue'>				fprintf(fd, "\n");</span>
+<span style='color: blue'>				i = 0;</span>
+<span style='color: blue'>				while(i < dist)</span>
+<span style='color: blue'>				{</span>
+<span style='color: blue'>					char ch = '\0';</span>
+<span style='color: blue'>					int k = 0;</span>
+<span style='color: blue'>					int q;</span>
+<span style='color: blue'>					if(buffer[i] == 34)‘,</span>
+<span style='color: blue'>					{</span>
+<span style='color: blue'>						printf("Litteral : ");</span>
+<span style='color: blue'>						do</span>
+<span style='color: blue'>						{</span>
+<span style='color: blue'>							//fprintf(fd,"<span style='color: green'>%c</span>", buffer[i]);</span>
+<span style='color: blue'>							printf("%c", buffer[i]);</span>
+<span style='color: blue'>							i++;</span>
+<span style='color: blue'>						}while(buffer[i] != 34);</span>
+<span style='color: blue'></span>
+<span style='color: blue'>						printf("%c\n", buffer[i]);</span>
+<span style='color: blue'>					}</span>
+<span style='color: blue'>					if(buffer[i] == 39)¡ã</span>
+<span style='color: blue'>					{</span>
+<span style='color: blue'>						printf("character constant: ");</span>
+<span style='color: blue'>						do</span>
+<span style='color: blue'>						{</span>
+<span style='color: blue'>							printf("%c", buffer[i]);</span>
+<span style='color: blue'>							i++;</span>
+<span style='color: blue'>						}while(buffer[i] != 39);</span>
+<span style='color: blue'>						printf("%c\n", buffer[i]);</span>
+<span style='color: blue'>					}</span>
+<span style='color: blue'></span>
+<span style='color: blue'>					while (buffer[i] != ' ' && buffer[i] != '\t' && !(ch = operator_checking(&buffer[i])))</span>
+<span style='color: blue'>					{</span>
+<span style='color: blue'>						word[k++] = buffer[i++];</span>
+<span style='color: blue'>						if(i == dist)</span>
+<span style='color: blue'>						{</span>
+<span style='color: blue'>							break;</span>
+<span style='color: blue'>						}</span>
+<span style='color: blue'>					}</span>
+<span style='color: blue'>					</span>
+<span style='color: blue'>				//	printf("i11\n");</span>
+<span style='color: blue'>					//					printf("%s\n", word);</span>
+<span style='color: blue'>					if (isdigit(word[0]))</span>
+<span style='color: blue'>					{</span>
+<span style='color: blue'>						printf("constant : %s \n", word);</span>
+<span style='color: blue'>					}</span>
+<span style='color: blue'>					else if (isalpha(word[0]))</span>
+<span style='color: blue'>					{</span>
+<span style='color: blue'>//						printf("Word is %s\n", word);</span>
+<span style='color: blue'>						//fprintf(fd,"<span style='color: yellow'>%s</span>", word);</span>
+<span style='color: blue'>						keyword_checking(word);</span>
+<span style='color: blue'>					}</span>
+<span style='color: blue'>					else if(word[0] == 34)</span>
+<span style='color: blue'>					{</span>
+<span style='color: blue'>					//	printf("Litteral : %s\n", word);Q</span>
+<span style='color: blue'>					}</span>
+<span style='color: blue'>					else</span>
+<span style='color: blue'>					{</span>
+<span style='color: blue'>					//	printf("Character constant : %s\n", word);</span>
+<span style='color: blue'>					}</span>
+<span style='color: blue'>					if (ch != '\0')</span>
+<span style='color: blue'>					{</span>
+<span style='color: blue'>						printf("operator : %c \n",ch);</span>
+<span style='color: blue'>						//fprintf(fd,"<span style='color: brown'>%c</span>", ch);</span>
+<span style='color: blue'>						ch = '\0';</span>
+<span style='color: blue'>					}</span>
+<span style='color: blue'>					i++;</span>
+<span style='color: blue'>					for(k = 0; k <25; k++)</span>
+<span style='color: blue'>					{</span>
+<span style='color: blue'>						word[k] = '\0';</span>
+<span style='color: blue'>					}</span>
+<span style='color: blue'></span>
+<span style='color: blue'>//					printf("Word after freeing : %s\n", word);</span>
+<span style='color: blue'>				}</span>
+<span style='color: blue'>//				printf("Line ended\n");</span>
+<span style='color: blue'>			}</span>
+<span style='color: blue'>			fseek(fp1,1,SEEK_CUR);</span>
+<span style='color: blue'>			//		printf("%s\n", buffer);</span>
+<span style='color: blue'>			fseek(fp, dist + 1, SEEK_CUR);</span>
+<span style='color: blue'>		}</span>
+<span style='color: blue'>	}</span>
+<span style='color: blue'>	</span>
+<span style='color: blue'></span>
+<span style='color: blue'>	fprintf(fd, "</pre>\n");</span>
+<span style='color: blue'>	fprintf(fd, "</body>\n");</span>
+<span style='color: blue'>	fprintf(fd, "</html>\n");</span>
+<span style='color: blue'>}</span>
+<span style='color: blue'></span>
+<span style='color: blue'>//Searching for preprocessor</span>
+<span style='color: blue'>void preprocessor(char *buffer, int size, FILE *fd)</span>
+<span style='color: blue'>{</span>
+<span style='color: blue'>	int i = 0, j;</span>
+<span style='color: blue'>	//header file </span>
+<span style='color: blue'>	if(buffer[i] == '#')</span>
+<span style='color: blue'>	{</span>
+<span style='color: blue'>		printf("Preprocessor directive : ");</span>
+<span style='color: blue'>		while(buffer[i] != ' ')</span>
+<span style='color: blue'>		{</span>
+<span style='color: blue'>			printf("%c", buffer[i]);</span>
+<span style='color: blue'>			//<span style='color: blue'>G</span></span>
+<span style='color: blue'>			//fprintf(fd,"<span style='color: blue'>%c</span>", buffer[i]);</span>
+<span style='color: blue'>			i++;</span>
+<span style='color: blue'>		}</span>
+<span style='color: blue'>		printf("\n");</span>
+<span style='color: blue'>		i++;</span>
+<span style='color: blue'>		if(buffer[i] == '<' || buffer[i] == '"')</span>
+<span style='color: blue'>		{</span>
+<span style='color: blue'>			printf("Header file : %s\n", &buffer[i]);</span>
+<span style='color: blue'>			j = i;</span>
+<span style='color: blue'>			while(buffer[j] != '\0')</span>
+<span style='color: blue'>			{</span>
+<span style='color: blue'>				fprintf(fd,"<span style='color: red'>%c</span>", buffer[j]);</span>
+<span style='color: blue'>				j++;</span>
+<span style='color: blue'>			}</span>
+<span style='color: blue'>		}</span>
+<span style='color: blue'>	}</span>
+<span style='color: blue'>}</span>
+<span style='color: blue'></span>
+<span style='color: blue'>int keyword_checking(char *buffer)</span>
+<span style='color: blue'>{</span>
+<span style='color: blue'>	for (int i = 0; i < 32; i++)</span>
+<span style='color: blue'>	{</span>
+<span style='color: blue'>		char *key = (char *)malloc(strlen(keyword[i]));;</span>
+<span style='color: blue'>		strcpy(key, keyword[i]);</span>
+<span style='color: blue'>//		printf("Biuffer is %s  \t key is %s\n", buffer, key);</span>
+<span style='color: blue'>		if (strcmp(buffer,key) == 0)</span>
+<span style='color: blue'>		{</span>
+<span style='color: blue'>//			printf("keyword match\n");</span>
+<span style='color: blue'>			printf("Keyword : %s\n", buffer);</span>
+<span style='color: blue'>			return 0;</span>
+<span style='color: blue'>		}</span>
+<span style='color: blue'>	}</span>
+<span style='color: blue'>	printf("Identifier: %s\n", buffer);</span>
+<span style='color: blue'>	return -1;</span>
+<span style='color: blue'>}</span>
+<span style='color: blue'></span>
+<span style='color: blue'>char operator_checking(char*buffer)</span>
+<span style='color: blue'>{</span>
+<span style='color: blue'>	for (int i = 0; i < 16; i++)</span>
+<span style='color: blue'>	{</span>
+<span style='color: blue'>		if (*buffer == operator[i])</span>
+<span style='color: blue'>		{</span>
+<span style='color: blue'>			return *buffer;</span>
+<span style='color: blue'>		}</span>
+<span style='color: blue'>	}</span>
+<span style='color: blue'>	return 0;</span>
+<span style='color: blue'>}</span>
+<span style='color: blue'></span>
+</pre>
+</body>
+</html>
