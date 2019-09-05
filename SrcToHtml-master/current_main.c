@@ -15,7 +15,7 @@ char operator_checking(char*buffer);
 
 int main(int argc, char *argv[])
 {
-	int i = 0, ch, dist, dist1;
+	int i = 0, ch, dist, dist1, flag;
 	FILE *fp1, *fp, *fd, *fd1;
 
 	char *buffer;
@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 	fp1 = fopen(argv[1], "r");
 	fd = fopen("de.html", "w");
 	fd1 = fopen("de.html", "w"); 
-	
+
 	fprintf(fd, "<!DOCTYPE html>\n");
 	fprintf(fd, "<html lang=\"en-US\">\n");
 	fprintf(fd, "<head>\n");
@@ -39,9 +39,9 @@ int main(int argc, char *argv[])
 	fprintf(fd, "<meta charset=\"UTF-8\">\n");
 	//fprintf(fd, "<link rel=\"stylesheet\" href=\"styles.css\">\n");
 	fprintf(fd, "</head>\n");
-	fprintf(fd, "<body style=\"background-color:lightgrey;\">\n");
+	fprintf(fd, "<body style=\"background-color:black;\">\n");
 	fprintf(fd, "<pre>\n");
-	
+
 	//fseek(fd1,ftell(fd),SEEK_SET);
 	//printf("%ld\n",ftell(fd));
 	//printf("%ld\n",ftell(fd1));
@@ -90,7 +90,17 @@ int main(int argc, char *argv[])
 							i++;
 						}while(buffer[i] != 34);
 
-						printf("%c\n", buffer[i]);
+						fprintf(fd,"<span style='color: green'>%c</span>", buffer[i]);
+						//	printf("%c\n", buffer[i]);
+					}
+					if(buffer[i] == '/' && buffer[i + 1] == '/')
+					{
+						while(i < dist)
+						{
+							fprintf(fd,"<span style='color: blue'>%c</span>", buffer[i]);
+							i++;
+						}
+						continue;
 					}
 					if(buffer[i] == 39)
 					{
@@ -98,11 +108,20 @@ int main(int argc, char *argv[])
 						do
 						{
 							printf("%c", buffer[i]);
+							fprintf(fd,"<span style='color: firebrick'>%c</span>", buffer[i]);
 							i++;
 						}while(buffer[i] != 39);
-						printf("%c\n", buffer[i]);
+						fprintf(fd,"<span style='color: firebrick'>%c</span>", buffer[i]);
+						//		printf("%c\n", buffer[i]);
 					}
-
+					if(buffer[i] == ' ')
+					{
+						fprintf(fd," ");
+					}
+					if(buffer[i] == '\t')
+					{
+						fprintf(fd,"\t");
+					}
 					while (buffer[i] != ' ' && buffer[i] != '\t' && !(ch = operator_checking(&buffer[i])))
 					{
 						word[k++] = buffer[i++];
@@ -111,31 +130,43 @@ int main(int argc, char *argv[])
 							break;
 						}
 					}
-					
-				//	printf("i11\n");
 					//					printf("%s\n", word);
 					if (isdigit(word[0]))
 					{
+
+						fprintf(fd,"<span style='color: darkgreen'>%s</span>", word);
 						printf("constant : %s \n", word);
 					}
 					else if (isalpha(word[0]))
 					{
-//						printf("Word is %s\n", word);
-						fprintf(fd,"<span style='color: yellow'>%s</span>", word);
-						keyword_checking(word);
-					}
-					else if(word[0] == 34)
-					{
-					//	printf("Litteral : %s\n", word);
-					}
-					else
-					{
-					//	printf("Character constant : %s\n", word);
+						flag = keyword_checking(word);
+						if(ch == '\0')
+						{
+							if(flag)
+							{
+								fprintf(fd,"<span style='color: white'>%s </span>", word);
+							}
+							else
+							{
+								fprintf(fd,"<span style='color: GoldenRod'>%s </span>", word);
+							}
+						}
+						else
+						{
+							if(flag)
+							{
+								fprintf(fd,"<span style='color: white'>%s</span>", word);
+							}
+							else
+							{
+								fprintf(fd,"<span style='color: GoldenRod'>%s</span>", word);
+							}
+						}
 					}
 					if (ch != '\0')
 					{
 						printf("operator : %c \n",ch);
-						fprintf(fd,"<span style='color: brown'>%c</span>", ch);
+						fprintf(fd,"<span style='color: Fuchsia'>%c</span>", ch);
 						ch = '\0';
 					}
 					i++;
@@ -143,23 +174,19 @@ int main(int argc, char *argv[])
 					{
 						word[k] = '\0';
 					}
-
-//					printf("Word after freeing : %s\n", word);
+					//					printf("Word after freeing : %s\n", word);
 				}
-//				printf("Line ended\n");
+				//				printf("Line ended\n");
 			}
 			fseek(fp1,1,SEEK_CUR);
 			//		printf("%s\n", buffer);
 			fseek(fp, dist + 1, SEEK_CUR);
 		}
 	}
-	
-
 	fprintf(fd, "</pre>\n");
 	fprintf(fd, "</body>\n");
 	fprintf(fd, "</html>\n");
 }
-
 //Searching for preprocessor
 void preprocessor(char *buffer, int size, FILE *fd)
 {
@@ -189,17 +216,16 @@ void preprocessor(char *buffer, int size, FILE *fd)
 		}
 	}
 }
-
 int keyword_checking(char *buffer)
 {
 	for (int i = 0; i < 32; i++)
 	{
 		char *key = (char *)malloc(strlen(keyword[i]));;
 		strcpy(key, keyword[i]);
-//		printf("Biuffer is %s  \t key is %s\n", buffer, key);
+		//		printf("Biuffer is %s  \t key is %s\n", buffer, key);
 		if (strcmp(buffer,key) == 0)
 		{
-//			printf("keyword match\n");
+			//			printf("keyword match\n");
 			printf("Keyword : %s\n", buffer);
 			return 0;
 		}
@@ -219,4 +245,3 @@ char operator_checking(char*buffer)
 	}
 	return 0;
 }
-
